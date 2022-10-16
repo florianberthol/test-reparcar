@@ -1,4 +1,5 @@
 App\Entity\Book:
-  book_{1..10}:
+  book_{1..100}:
     title: <sentence()>
     resume: <paragraph()>
+    author: '@author_*'

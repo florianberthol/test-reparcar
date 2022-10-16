@@ -2,51 +2,54 @@
 
 namespace App\Controller;
 
+use App\Entity\Book;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Environment;
 
 class BookController extends AbstractController
 {
     /**
-     * return all namme of books in json format
+     * return all name of books in json format
      *
      */
-    #[Route('/books/list', name: 'list-of-my-books', methods: ['POST'], format: 'json')]
-    public function book()
+    #[Route('/books/list', name: 'list-of-my-books', methods: ['GET'], format: 'json')]
+    public function book(ManagerRegistry $doctrine, Environment $twig): Response
     {
-        $book = $this->container->get('doctrine.orm.default_entity_manager')->getRepository("App\Entity\Book")->findBy(['id' => 1]);
+        $book = $doctrine->getRepository(Book::class)->findOneBy(['id' => 101]);
+        $template = $twig->load('book/index.html.twig');
 
-        $template = $this->container->get('twig')->load('book/index.html.twig');
-
-        return $template->render([
-            'return' => json_encode([
-                'data' => json_encode($book[0]['name'])
+        return new Response($template->render([
+            'result' => json_encode([
+                'data' => json_encode($book?->getTitle())
             ]),
-        ]);
+        ]));
     }
 
     /**
      * parcour all books and add sufix on name
      */
-    #[Route('/books/add-sufix', name: 'add-sufix-on-my-books', methods: ['GET'], format: 'json')]
-    public function addSufix(string $suffix)
+    #[Route('/books/add-sufix/{suffix}', name: 'add-sufix-on-my-books', methods: ['PUT'], format: 'json')]
+    public function addSufix(string $suffix, ManagerRegistry $doctrine, Environment $twig): Response
     {
-        $books = $this->container->get('doctrine.orm.default_entity_manager')->getRepository("App\Entity\Book")->findBy([]);
+        $books = $doctrine->getRepository(Book::class)->findBy([]);
 
         foreach ($books as $book) {
-            $book->name .= ' - Sufix';
-            $this->container->get('doctrine.orm.default_entity_manager')->persist($book);
-            $this->container->get('doctrine.orm.default_entity_manager')->flush();
+            $book->setTitle($book->getTitle() . ' - ' . $suffix);
+            $doctrine->getManager()->persist($book);
+            $doctrine->getManager()->flush();
         }
 
 
-        $template = $this->container->get('twig')->load('book/index.html.twig');
+        $template = $twig->load('book/index.html.twig');
 
-        return $template->render([
-            'return' => json_encode([
+        return new Response($template->render([
+            'result' => json_encode([
                 'data' => json_encode('ok'),
                 'books' => json_encode($books)
             ]),
-        ]);
+        ]));
     }
 }

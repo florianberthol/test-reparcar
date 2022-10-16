@@ -5,7 +5,7 @@ namespace App\Service;
 class Common
 {
     /**
-     * ???
+     * Aplanie un tableau multidimensionnel
      */
     public static function boo(array $array): array
     {
@@ -18,7 +18,8 @@ class Common
     }
 
     /**
-     * ???
+     * retourne un tableau avec le premier tableau passé en parametre sans modification
+     * et y ajoute la donnée qui a l'index K dans le 2nd tableau comme index de la donnée V
      */
     public static function foo(array $array1, array $array2): array
     {
@@ -26,7 +27,7 @@ class Common
     }
 
     /**
-     * ???
+     * Return true si les deux tableau sont vide
      */
     public static function bar(array $array1, array $array2): bool
     {

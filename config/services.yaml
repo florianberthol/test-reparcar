@@ -20,7 +20,6 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-
     App\Entity\Query\Query:
         public: true
 

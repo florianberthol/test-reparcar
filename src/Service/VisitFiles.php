@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use Symfony\Component\Finder\Finder;
+
 class File
 {
     public function __construct(
@@ -30,20 +32,33 @@ class VisitFiles
      *
      * Return a list of every files filtered by given function.
      *
-     * @param TODO $root
-     * @param TODO $filterFn
+     * @param string $root
+     * @param callable $filterFn
      *
-     * @return TODO
+     * @return array
      */
-    public function visitFiles($root, callable $filterFn): void
+    public function visitFiles(string $root, callable $filterFn): array
     {
-        // @TODO
+        $finder = new Finder();
+        $files = [];
+
+        foreach ($finder->in($root)->files() as $file) {
+            $file = (object) [
+                'name' => $file->getFilename(),
+                'path' => $file->getPathname(),
+            ];
+            if ($filterFn($file)) {
+                $files[] = $file;
+            }
+        }
+
+        return $files;
     }
 
     public function usageExemple(): void
     {
-        $this->visitFiles(
-            null, // @TODO use a concrete root exemple
+        $files = $this->visitFiles(
+            __DIR__,
             function ($file) {
                 $name = $file->name;
                 for ($i = 0; $i < floor(strlen($name)); $i++) {
